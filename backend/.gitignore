@@ -1,0 +1,22 @@
+# binários
+/pagcore
+*.exe
+*.out
+
+# configs e secrets
+.env
+.env.*
+*.key
+*.pem
+
+# editor/IDE
+.vscode/
+.idea/
+*.swp
+
+# banco de dados local
+pgdata/
+*.db
+
+# logs
+*.log
