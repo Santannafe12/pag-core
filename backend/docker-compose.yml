@@ -6,7 +6,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      DB_HOST: db
+      DB_HOST: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@ep-proud-fog-acg6tu4u-pooler.sa-east-1.aws.neon.tech/${POSTGRES_DB}?sslmode=require
       DB_PORT: 5432
       DB_USER: ${POSTGRES_USER}
       DB_PASSWORD: ${POSTGRES_PASSWORD}
