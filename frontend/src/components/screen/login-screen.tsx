@@ -1,27 +1,34 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import Link from "next/link"
-import { Eye, EyeOff, Lock, Mail } from "lucide-react"
+import { useState } from "react";
+import Link from "next/link";
+import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export default function LoginScreen() {
-  const [showPassword, setShowPassword] = useState(false)
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     // Handle login logic here
-    console.log("Login attempt with:", { email, password })
-  }
+    console.log("Login attempt with:", { email, password });
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
@@ -32,8 +39,12 @@ export default function LoginScreen() {
               <Lock className="h-6 w-6 text-primary" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold text-center">PagCore</CardTitle>
-          <CardDescription className="text-center">Enter your credentials to access your account</CardDescription>
+          <CardTitle className="text-2xl font-bold text-center">
+            PagCore
+          </CardTitle>
+          <CardDescription className="text-center">
+            Insira suas credenciais para acessar sua conta
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -44,7 +55,7 @@ export default function LoginScreen() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="name@example.com"
+                  placeholder="nome@exemplo.com"
                   className="pl-10"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -54,9 +65,9 @@ export default function LoginScreen() {
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">Senha</Label>
                 <Link href="#" className="text-sm text-primary hover:underline">
-                  Forgot password?
+                  Esqueceu a senha?
                 </Link>
               </div>
               <div className="relative">
@@ -73,32 +84,39 @@ export default function LoginScreen() {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
                 >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showPassword ? (
+                    <Eye className="h-4 w-4" />
+                  ) : (
+                    <EyeOff className="h-4 w-4" />
+                  )}
                 </button>
               </div>
             </div>
             <div className="flex items-center space-x-2">
               <Checkbox id="remember" />
               <Label htmlFor="remember" className="text-sm font-normal">
-                Remember me
+                Lembrar de mim
               </Label>
             </div>
             <Button type="submit" className="w-full">
-              Sign In
+              Entrar
             </Button>
           </form>
         </CardContent>
         <CardFooter className="flex justify-center">
           <p className="text-sm text-muted-foreground">
-            Don&apos;t have an account?{" "}
-            <Link href="/register" className="text-primary font-medium hover:underline">
-              Create Account
+            Não tem uma conta?{" "}
+            <Link
+              href="/register"
+              className="text-primary font-medium hover:underline"
+            >
+              Criar Conta
             </Link>
           </p>
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 }

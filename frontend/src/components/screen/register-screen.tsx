@@ -1,115 +1,139 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import Link from "next/link"
-import { ArrowLeft, Eye, EyeOff, Lock, Mail, User, CheckCircle2, AlertCircle } from "lucide-react"
+import { useState } from "react";
+import Link from "next/link";
+import {
+  ArrowLeft,
+  Eye,
+  EyeOff,
+  Lock,
+  Mail,
+  User,
+  CheckCircle2,
+  AlertCircle,
+} from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function RegisterScreen() {
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
     cpf: "",
     password: "",
     confirmPassword: "",
-  })
-  const [errors, setErrors] = useState<Record<string, string>>({})
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isSuccess, setIsSuccess] = useState(false)
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
 
     // Format CPF as user types (XXX.XXX.XXX-XX)
     if (name === "cpf") {
-      let formattedValue = value.replace(/\D/g, "")
+      let formattedValue = value.replace(/\D/g, "");
       if (formattedValue.length > 11) {
-        formattedValue = formattedValue.slice(0, 11)
+        formattedValue = formattedValue.slice(0, 11);
       }
 
       // Add formatting
       if (formattedValue.length > 9) {
-        formattedValue = `${formattedValue.slice(0, 3)}.${formattedValue.slice(3, 6)}.${formattedValue.slice(6, 9)}-${formattedValue.slice(9)}`
+        formattedValue = `${formattedValue.slice(0, 3)}.${formattedValue.slice(
+          3,
+          6
+        )}.${formattedValue.slice(6, 9)}-${formattedValue.slice(9)}`;
       } else if (formattedValue.length > 6) {
-        formattedValue = `${formattedValue.slice(0, 3)}.${formattedValue.slice(3, 6)}.${formattedValue.slice(6)}`
+        formattedValue = `${formattedValue.slice(0, 3)}.${formattedValue.slice(
+          3,
+          6
+        )}.${formattedValue.slice(6)}`;
       } else if (formattedValue.length > 3) {
-        formattedValue = `${formattedValue.slice(0, 3)}.${formattedValue.slice(3)}`
+        formattedValue = `${formattedValue.slice(0, 3)}.${formattedValue.slice(
+          3
+        )}`;
       }
 
-      setFormData({ ...formData, [name]: formattedValue })
+      setFormData({ ...formData, [name]: formattedValue });
     } else {
-      setFormData({ ...formData, [name]: value })
+      setFormData({ ...formData, [name]: value });
     }
 
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors({ ...errors, [name]: "" })
+      setErrors({ ...errors, [name]: "" });
     }
-  }
+  };
 
   const validateForm = () => {
-    const newErrors: Record<string, string> = {}
+    const newErrors: Record<string, string> = {};
 
     // Validate full name
     if (!formData.fullName.trim()) {
-      newErrors.fullName = "Full name is required"
+      newErrors.fullName = "Nome completo é obrigatório";
     }
 
     // Validate email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!formData.email) {
-      newErrors.email = "Email is required"
+      newErrors.email = "Email é obrigatório";
     } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = "Please enter a valid email address"
+      newErrors.email = "Por favor, insira um endereço de email válido";
     }
 
     // Validate CPF
-    const cpfRegex = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/
+    const cpfRegex = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
     if (!formData.cpf) {
-      newErrors.cpf = "CPF is required"
+      newErrors.cpf = "CPF é obrigatório";
     } else if (!cpfRegex.test(formData.cpf)) {
-      newErrors.cpf = "Please enter a valid CPF (XXX.XXX.XXX-XX)"
+      newErrors.cpf = "Por favor, insira um CPF válido (XXX.XXX.XXX-XX)";
     }
 
     // Validate password
     if (!formData.password) {
-      newErrors.password = "Password is required"
+      newErrors.password = "Senha é obrigatória";
     } else if (formData.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters"
+      newErrors.password = "A senha deve ter pelo menos 8 caracteres";
     }
 
     // Validate password confirmation
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = "Please confirm your password"
+      newErrors.confirmPassword = "Por favor, confirme sua senha";
     } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match"
+      newErrors.confirmPassword = "As senhas não coincidem";
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (validateForm()) {
-      setIsSubmitting(true)
+      setIsSubmitting(true);
 
       try {
         // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1500))
+        await new Promise((resolve) => setTimeout(resolve, 1500));
 
         // Show success state
-        setIsSuccess(true)
+        setIsSuccess(true);
 
         // Reset form after success (optional)
         // setFormData({
@@ -120,15 +144,15 @@ export default function RegisterScreen() {
         //   confirmPassword: ""
         // })
       } catch (error) {
-        console.error("Registration error:", error)
+        console.error("Registration error:", error);
         setErrors({
-          form: "An error occurred during registration. Please try again.",
-        })
+          form: "Ocorreu um erro durante o registro. Por favor, tente novamente.",
+        });
       } finally {
-        setIsSubmitting(false)
+        setIsSubmitting(false);
       }
     }
-  }
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
@@ -139,19 +163,23 @@ export default function RegisterScreen() {
               <User className="h-6 w-6 text-primary" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold text-center">Create PagCore Account</CardTitle>
-          <CardDescription className="text-center">Enter your information to register</CardDescription>
+          <CardTitle className="text-2xl font-bold text-center">
+            Criar Conta PagCore
+          </CardTitle>
+          <CardDescription className="text-center">
+            Insira suas informações para se registrar
+          </CardDescription>
         </CardHeader>
         <CardContent>
           {isSuccess ? (
             <Alert className="bg-green-50 border-green-200">
               <CheckCircle2 className="h-4 w-4 text-green-600" />
               <AlertDescription className="text-green-600">
-                Registration successful! You can now{" "}
+                Registro bem-sucedido! Agora você pode{" "}
                 <Link href="/login" className="font-medium underline">
-                  log in
+                  fazer login
                 </Link>{" "}
-                to your account.
+                na sua conta.
               </AlertDescription>
             </Alert>
           ) : (
@@ -164,19 +192,23 @@ export default function RegisterScreen() {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="fullName">Full Name</Label>
+                <Label htmlFor="fullName">Nome Completo</Label>
                 <div className="relative">
                   <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="fullName"
                     name="fullName"
-                    placeholder="John Doe"
-                    className={`pl-10 ${errors.fullName ? "border-red-500" : ""}`}
+                    placeholder="João Silva"
+                    className={`pl-10 ${
+                      errors.fullName ? "border-red-500" : ""
+                    }`}
                     value={formData.fullName}
                     onChange={handleChange}
                   />
                 </div>
-                {errors.fullName && <p className="text-sm text-red-500">{errors.fullName}</p>}
+                {errors.fullName && (
+                  <p className="text-sm text-red-500">{errors.fullName}</p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -187,13 +219,15 @@ export default function RegisterScreen() {
                     id="email"
                     name="email"
                     type="email"
-                    placeholder="name@example.com"
+                    placeholder="nome@exemplo.com"
                     className={`pl-10 ${errors.email ? "border-red-500" : ""}`}
                     value={formData.email}
                     onChange={handleChange}
                   />
                 </div>
-                {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
+                {errors.email && (
+                  <p className="text-sm text-red-500">{errors.email}</p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -211,18 +245,22 @@ export default function RegisterScreen() {
                     onChange={handleChange}
                   />
                 </div>
-                {errors.cpf && <p className="text-sm text-red-500">{errors.cpf}</p>}
+                {errors.cpf && (
+                  <p className="text-sm text-red-500">{errors.cpf}</p>
+                )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">Senha</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="password"
                     name="password"
                     type={showPassword ? "text" : "password"}
-                    className={`pl-10 pr-10 ${errors.password ? "border-red-500" : ""}`}
+                    className={`pl-10 pr-10 ${
+                      errors.password ? "border-red-500" : ""
+                    }`}
                     value={formData.password}
                     onChange={handleChange}
                   />
@@ -230,23 +268,33 @@ export default function RegisterScreen() {
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
-                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    aria-label={
+                      showPassword ? "Ocultar senha" : "Mostrar senha"
+                    }
                   >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showPassword ? (
+                      <Eye className="h-4 w-4" />
+                    ) : (
+                      <EyeOff className="h-4 w-4" />
+                    )}
                   </button>
                 </div>
-                {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
+                {errors.password && (
+                  <p className="text-sm text-red-500">{errors.password}</p>
+                )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Label htmlFor="confirmPassword">Confirmar Senha</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="confirmPassword"
                     name="confirmPassword"
                     type={showConfirmPassword ? "text" : "password"}
-                    className={`pl-10 pr-10 ${errors.confirmPassword ? "border-red-500" : ""}`}
+                    className={`pl-10 pr-10 ${
+                      errors.confirmPassword ? "border-red-500" : ""
+                    }`}
                     value={formData.confirmPassword}
                     onChange={handleChange}
                   />
@@ -254,27 +302,40 @@ export default function RegisterScreen() {
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
-                    aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                    aria-label={
+                      showConfirmPassword ? "Ocultar senha" : "Mostrar senha"
+                    }
                   >
-                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showConfirmPassword ? (
+                      <Eye className="h-4 w-4" />
+                    ) : (
+                      <EyeOff className="h-4 w-4" />
+                    )}
                   </button>
                 </div>
-                {errors.confirmPassword && <p className="text-sm text-red-500">{errors.confirmPassword}</p>}
+                {errors.confirmPassword && (
+                  <p className="text-sm text-red-500">
+                    {errors.confirmPassword}
+                  </p>
+                )}
               </div>
 
               <Button type="submit" className="w-full" disabled={isSubmitting}>
-                {isSubmitting ? "Creating Account..." : "Create Account"}
+                {isSubmitting ? "Criando Conta..." : "Criar Conta"}
               </Button>
             </form>
           )}
         </CardContent>
         <CardFooter className="flex justify-center">
-          <Link href="/login" className="flex items-center text-sm text-primary font-medium hover:underline">
+          <Link
+            href="/login"
+            className="flex items-center text-sm text-primary font-medium hover:underline"
+          >
             <ArrowLeft className="mr-1 h-4 w-4" />
-            Back to Login
+            Voltar para Login
           </Link>
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 }

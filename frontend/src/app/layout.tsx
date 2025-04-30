@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
+import Footer from "@/components/layout/footer";
+import Navbar from "@/components/layout/navbar";
 
 export const metadata: Metadata = {
   title: "PagCore - App",
@@ -15,7 +17,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <main>{children}</main>
+        <main>
+          <Navbar />
+          {children}
+          <Footer />
+        </main>
         <Toaster />
       </body>
     </html>
