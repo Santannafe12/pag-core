@@ -85,7 +85,10 @@ func Login(c *gin.Context) {
 		ExpiresAt: expirationTime,
 	}
 	config.DB.Create(&session)
-	c.JSON(http.StatusOK, gin.H{"token": tokenStr})
+	c.JSON(http.StatusOK, gin.H{
+		"token": tokenStr,
+		"role":  user.Role,
+	})
 }
 
 func Logout(c *gin.Context) {
