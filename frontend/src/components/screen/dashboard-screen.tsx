@@ -140,7 +140,7 @@ export default function DashboardScreen({
                   </Button>
                   {role === "admin" && (
                     <Button variant="ghost" className="justify-start" asChild>
-                      <Link href="/transactions">Admin</Link>
+                      <Link href="/admin">Admin</Link>
                     </Button>
                   )}
                 </div>
@@ -222,7 +222,7 @@ export default function DashboardScreen({
             </Button>
             {role === "admin" && (
               <Button variant="ghost" className="justify-start" asChild>
-                <Link href="/transactions">Admin</Link>
+                <Link href="/admin">Admin</Link>
               </Button>
             )}
           </nav>
