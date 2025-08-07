@@ -41,10 +41,19 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { logout } from "@/actions/logout";
 
-export default function DashboardScreen({ user, transactions: initialTransactions }: { user: any; transactions: any[] }) {
+export default function DashboardScreen({
+  user,
+  transactions: initialTransactions,
+  role,
+}: {
+  user: any;
+  transactions: any[];
+  role: any;
+}) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredTransactions, setFilteredTransactions] = useState(initialTransactions);
+  const [filteredTransactions, setFilteredTransactions] =
+    useState(initialTransactions);
   const router = useRouter();
 
   const handleLogout = () => {
@@ -64,19 +73,25 @@ export default function DashboardScreen({ user, transactions: initialTransaction
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-    })
+    });
 
-    logout()
+    logout();
   };
 
   useEffect(() => {
     const filtered = initialTransactions.filter((tx) => {
       const isOutflow = tx.SenderID === user.user_id;
       const otherUser = isOutflow ? tx.Recipient : tx.Sender;
-      const description = tx.Description || (isOutflow ? `Transfer to ${otherUser.FullName}` : `Payment from ${otherUser.FullName}`);
-      return description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-             tx.Amount.toString().includes(searchQuery) ||
-             new Date(tx.CreatedAt).toLocaleString("pt-BR").includes(searchQuery);
+      const description =
+        tx.Description ||
+        (isOutflow
+          ? `Transfer to ${otherUser.FullName}`
+          : `Payment from ${otherUser.FullName}`);
+      return (
+        description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        tx.Amount.toString().includes(searchQuery) ||
+        new Date(tx.CreatedAt).toLocaleString("pt-BR").includes(searchQuery)
+      );
     });
     setFilteredTransactions(filtered);
   }, [searchQuery, initialTransactions, user.user_id]);
@@ -123,6 +138,11 @@ export default function DashboardScreen({ user, transactions: initialTransaction
                       Transações
                     </Link>
                   </Button>
+                  {role === "admin" && (
+                    <Button variant="ghost" className="justify-start" asChild>
+                      <Link href="/transactions">Admin</Link>
+                    </Button>
+                  )}
                 </div>
                 <div className="mt-auto">
                   <Button
@@ -200,6 +220,11 @@ export default function DashboardScreen({ user, transactions: initialTransaction
                 Transações
               </Link>
             </Button>
+            {role === "admin" && (
+              <Button variant="ghost" className="justify-start" asChild>
+                <Link href="/transactions">Admin</Link>
+              </Button>
+            )}
           </nav>
           <div className="mt-auto p-4 border-t">
             <Button
@@ -219,9 +244,9 @@ export default function DashboardScreen({ user, transactions: initialTransaction
           <header className="hidden lg:flex items-center justify-between p-4 bg-white border-b">
             <div className="relative w-64">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input 
-                placeholder="Search..." 
-                className="pl-8" 
+              <Input
+                placeholder="Search..."
+                className="pl-8"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -238,7 +263,9 @@ export default function DashboardScreen({ user, transactions: initialTransaction
                         src={user.avatar || "/placeholder.svg"}
                         alt={user.full_name}
                       />
-                      <AvatarFallback>{user.full_name.charAt(0)}</AvatarFallback>
+                      <AvatarFallback>
+                        {user.full_name.charAt(0)}
+                      </AvatarFallback>
                     </Avatar>
                     <span>{user.full_name}</span>
                   </Button>
@@ -255,7 +282,10 @@ export default function DashboardScreen({ user, transactions: initialTransaction
                     Configurações
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="text-red-500" onClick={handleLogout}>
+                  <DropdownMenuItem
+                    className="text-red-500"
+                    onClick={handleLogout}
+                  >
                     <LogOut className="mr-2 h-4 w-4" />
                     Logout
                   </DropdownMenuItem>
@@ -277,7 +307,7 @@ export default function DashboardScreen({ user, transactions: initialTransaction
                     </CardTitle>
                   </div>
                   <div className="bg-primary/5 p-4 rounded-lg">
-                    <CardDescription>Current Balance</CardDescription>
+                    <CardDescription>Saldo Atual</CardDescription>
                     <CardTitle className="text-3xl font-bold">
                       R${" "}
                       {user.balance.toLocaleString("pt-BR", {
@@ -336,15 +366,24 @@ export default function DashboardScreen({ user, transactions: initialTransaction
               <CardContent>
                 <div className="space-y-4">
                   {filteredTransactions.length === 0 ? (
-                    <p className="text-center text-muted-foreground">Nenhuma transação recente</p>
+                    <p className="text-center text-muted-foreground">
+                      Nenhuma transação recente
+                    </p>
                   ) : (
                     filteredTransactions.map((transaction) => {
                       const isOutflow = transaction.SenderID === user.user_id;
                       const type = isOutflow ? "outflow" : "inflow";
-                      const otherUser = isOutflow ? transaction.Recipient : transaction.Sender;
-                      const description = transaction.Description || 
-                        (isOutflow ? `Transfer to ${otherUser.FullName}` : `Payment from ${otherUser.FullName}`);
-                      const date = new Date(transaction.CreatedAt).toLocaleString("pt-BR", {
+                      const otherUser = isOutflow
+                        ? transaction.Recipient
+                        : transaction.Sender;
+                      const description =
+                        transaction.Description ||
+                        (isOutflow
+                          ? `Transfer to ${otherUser.FullName}`
+                          : `Payment from ${otherUser.FullName}`);
+                      const date = new Date(
+                        transaction.CreatedAt
+                      ).toLocaleString("pt-BR", {
                         dateStyle: "short",
                         timeStyle: "short",
                       });
@@ -357,7 +396,9 @@ export default function DashboardScreen({ user, transactions: initialTransaction
                           <div className="flex items-center gap-3">
                             <div
                               className={`h-10 w-10 rounded-full flex items-center justify-center ${
-                                type === "inflow" ? "bg-green-100" : "bg-red-100"
+                                type === "inflow"
+                                  ? "bg-green-100"
+                                  : "bg-red-100"
                               }`}
                             >
                               {type === "inflow" ? (
@@ -368,12 +409,16 @@ export default function DashboardScreen({ user, transactions: initialTransaction
                             </div>
                             <div>
                               <p className="font-medium">{description}</p>
-                              <p className="text-sm text-muted-foreground">{date}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {date}
+                              </p>
                             </div>
                           </div>
                           <div
                             className={`font-medium ${
-                              type === "inflow" ? "text-green-600" : "text-red-600"
+                              type === "inflow"
+                                ? "text-green-600"
+                                : "text-red-600"
                             }`}
                           >
                             {type === "inflow" ? "+" : "-"} R${" "}

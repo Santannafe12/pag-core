@@ -1,10 +1,10 @@
-"use server"
+"use server";
 
 import { cookies } from "next/headers";
 
 export async function logout() {
-    const cookieStore = cookies();
-    (await cookieStore).delete("auth_token");
-
-    return;
-} 
+  const cookieStore = cookies();
+  (await cookieStore).delete("auth_token");
+  (await cookieStore).delete("user_role");
+  return;
+}

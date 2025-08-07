@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 export default async function Dashboard() {
   const cookieStore = cookies();
   const token = (await cookieStore).get("auth_token")?.value;
+  const role = (await cookieStore).get("user_role")?.value;
 
   if (!token) {
     redirect("/login");
@@ -28,6 +29,6 @@ export default async function Dashboard() {
   const data = await res.json();
 
   return (
-    <DashboardScreen user={data} transactions={data.recent_transactions} />
+    <DashboardScreen user={data} transactions={data.recent_transactions} role={role} />
   );
 }

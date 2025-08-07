@@ -1,7 +1,6 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 
 export async function login(email: string, password: string) {
   try {
@@ -20,6 +19,12 @@ export async function login(email: string, password: string) {
     const data = await response.json();
     const cookieStore = cookies();
     (await cookieStore).set("auth_token", data.token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 24 * 60 * 60, // 24 hours
+    });
+    (await cookieStore).set("user_role", data.role, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
