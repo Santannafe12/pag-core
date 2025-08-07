@@ -39,7 +39,6 @@ func SetupRouter() *gin.Engine {
 			{
 				admin.GET("/users", controllers.GetUsers)
 				admin.POST("/users/block/:id", controllers.BlockUser)
-				admin.GET("/transactions", controllers.GetAdminTransactions)
 				admin.GET("/stats", controllers.GetStats)
 			}
 		}
