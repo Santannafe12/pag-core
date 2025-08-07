@@ -62,10 +62,11 @@ func MakeTransfer(c *gin.Context) {
 func GetTransactionHistory(c *gin.Context) {
 	userID := c.GetUint("user_id")
 	fromDate := c.Query("from_date") // e.g., "2025-01-01"
-	toDate := c.Query("to_date")
-	typeFilter := c.Query("type") // transfer, etc.
+	toDate := c.Query("to_date")     // e.g., "2025-12-31"
+	typeFilter := c.Query("type")    // e.g., "transfer"
 
-	query := config.DB.Where("sender_id = ? OR recipient_id = ?", userID, userID)
+	query := config.DB.Preload("Sender").Preload("Recipient").
+		Where("sender_id = ? OR recipient_id = ?", userID, userID)
 	if fromDate != "" {
 		query = query.Where("created_at >= ?", fromDate)
 	}

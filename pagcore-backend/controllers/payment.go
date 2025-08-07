@@ -60,15 +60,21 @@ func AcceptPaymentRequest(c *gin.Context) {
 	err := config.DB.Transaction(func(tx *gorm.DB) error {
 		payer.Balance -= req.Amount
 		requester.Balance += req.Amount
-		tx.Save(&payer)
-		tx.Save(&requester)
+		if err := tx.Save(&payer).Error; err != nil {
+			return err
+		}
+		if err := tx.Save(&requester).Error; err != nil {
+			return err
+		}
 		req.Status = models.PaymentStatusAccepted
-		tx.Save(&req)
+		if err := tx.Save(&req).Error; err != nil {
+			return err
+		}
 		txRecord := models.Transaction{
 			SenderID:    payer.ID,
 			RecipientID: requester.ID,
 			Amount:      req.Amount,
-			Description: req.Description,
+			Description: "Payment Request: " + req.Description,
 			Type:        models.TransactionTypeTransfer,
 		}
 		return tx.Create(&txRecord).Error
@@ -93,4 +99,21 @@ func DeclinePaymentRequest(c *gin.Context) {
 	req.Status = models.PaymentStatusDeclined
 	config.DB.Save(&req)
 	c.JSON(http.StatusOK, gin.H{"message": "Request declined"})
+}
+
+func GetPaymentRequests(c *gin.Context) {
+	userID := c.GetUint("user_id")
+	var sentRequests []models.PaymentRequest
+	var receivedRequests []models.PaymentRequest
+
+	// Fetch sent requests (where user is the requester)
+	config.DB.Preload("Requester").Preload("Payer").Where("requester_id = ?", userID).Find(&sentRequests)
+
+	// Fetch received requests (where user is the payer)
+	config.DB.Preload("Requester").Preload("Payer").Where("payer_id = ?", userID).Find(&receivedRequests)
+
+	c.JSON(http.StatusOK, gin.H{
+		"sent":     sentRequests,
+		"received": receivedRequests,
+	})
 }

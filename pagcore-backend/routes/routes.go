@@ -26,6 +26,7 @@ func SetupRouter() *gin.Engine {
 			protected.GET("/dashboard", controllers.GetDashboard)
 			protected.POST("/transfer", controllers.MakeTransfer)
 			protected.GET("/transactions", controllers.GetTransactionHistory)
+			protected.GET("/payment/payment-requests", controllers.GetPaymentRequests)
 			protected.POST("/payment/request", controllers.CreatePaymentRequest)
 			protected.POST("/payment/accept/:id", controllers.AcceptPaymentRequest)
 			protected.POST("/payment/decline/:id", controllers.DeclinePaymentRequest)
