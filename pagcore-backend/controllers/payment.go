@@ -74,7 +74,7 @@ func AcceptPaymentRequest(c *gin.Context) {
 			SenderID:    payer.ID,
 			RecipientID: requester.ID,
 			Amount:      req.Amount,
-			Description: "Payment Request: " + req.Description,
+			Description: "Pagamento Solicitado: " + req.Description,
 			Type:        models.TransactionTypeTransfer,
 		}
 		return tx.Create(&txRecord).Error
