@@ -58,7 +58,7 @@ export default function TransferScreen({ user }: TransferScreenProps) {
     const newErrors: Record<string, string> = {};
 
     if (!transferData.recipient.trim()) {
-      newErrors.recipient = "Usuário do recebedor é obrigatório";
+      newErrors.recipient = "Usuário do destinatário é obrigatório";
     }
 
     if (!transferData.amount) {
@@ -161,7 +161,7 @@ export default function TransferScreen({ user }: TransferScreenProps) {
           <CardHeader>
             <CardTitle>Detalhes de Transferência</CardTitle>
             <CardDescription>
-              Digite o usuário do recebedor e o valor
+              Digite o usuário do destinatário e o valor
             </CardDescription>
           </CardHeader>
           <CardContent>

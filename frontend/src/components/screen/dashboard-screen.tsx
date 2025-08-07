@@ -17,6 +17,7 @@ import {
   Send,
   Settings,
   User,
+  Lock,
   X,
 } from "lucide-react";
 
@@ -85,8 +86,8 @@ export default function DashboardScreen({
       const description =
         tx.Description ||
         (isOutflow
-          ? `Transfer to ${otherUser.FullName}`
-          : `Payment from ${otherUser.FullName}`);
+          ? `Transferência para ${otherUser.FullName}`
+          : `Pagamento de ${otherUser.FullName}`);
       return (
         description.toLowerCase().includes(searchQuery.toLowerCase()) ||
         tx.Amount.toString().includes(searchQuery) ||
@@ -132,16 +133,19 @@ export default function DashboardScreen({
                       Dashboard
                     </Link>
                   </Button>
-                  <Button variant="ghost" className="justify-start" asChild>
+                  {/* <Button variant="ghost" className="justify-start" asChild>
                     <Link href="/transactions">
                       <ArrowUpRight className="mr-2 h-4 w-4" />
                       Transações
                     </Link>
-                  </Button>
+                  </Button> */}
                   {role === "admin" && (
-                    <Button variant="ghost" className="justify-start" asChild>
-                      <Link href="/admin">Admin</Link>
-                    </Button>
+                    <div className="flex items-center gap-1">
+                      <Lock className="mr-2 h-4 w-4" />
+                      <Button variant="ghost" className="justify-start" asChild>
+                        <Link href="/admin">Admin</Link>
+                      </Button>
+                    </div>
                   )}
                 </div>
                 <div className="mt-auto">
@@ -214,16 +218,19 @@ export default function DashboardScreen({
                 Dashboard
               </Link>
             </Button>
-            <Button variant="ghost" className="justify-start" asChild>
+            {/* <Button variant="ghost" className="justify-start" asChild>
               <Link href="/transactions">
                 <ArrowUpRight className="mr-2 h-4 w-4" />
                 Transações
               </Link>
-            </Button>
+            </Button> */}
             {role === "admin" && (
-              <Button variant="ghost" className="justify-start" asChild>
-                <Link href="/admin">Admin</Link>
-              </Button>
+              <div className="flex items-center ml-3">
+                <Lock className="h-4 w-4" />
+                <Button variant="ghost" className="justify-start" asChild>
+                  <Link href="/admin">Admin</Link>
+                </Button>
+              </div>
             )}
           </nav>
           <div className="mt-auto p-4 border-t">
@@ -245,7 +252,7 @@ export default function DashboardScreen({
             <div className="relative w-64">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search..."
+                placeholder="Pesquisar..."
                 className="pl-8"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -301,7 +308,7 @@ export default function DashboardScreen({
               <CardContent className="pt-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                   <div>
-                    <CardDescription>Welcome back</CardDescription>
+                    <CardDescription>Bem-Vindo de volta!</CardDescription>
                     <CardTitle className="text-2xl font-bold">
                       {user.full_name}
                     </CardTitle>
@@ -320,7 +327,7 @@ export default function DashboardScreen({
             </Card>
 
             {/* Action Buttons */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <Button
                 size="lg"
                 className="h-auto py-6 flex flex-col items-center gap-2"
@@ -331,7 +338,7 @@ export default function DashboardScreen({
                   <span>Transferir</span>
                 </Link>
               </Button>
-              <Button
+              {/* <Button
                 size="lg"
                 className="h-auto py-6 flex flex-col items-center gap-2"
                 asChild
@@ -340,7 +347,7 @@ export default function DashboardScreen({
                   <QrCode className="h-6 w-6" />
                   <span>Receber via QR Code</span>
                 </Link>
-              </Button>
+              </Button> */}
               <Button
                 size="lg"
                 className="h-auto py-6 flex flex-col items-center gap-2"
@@ -379,8 +386,8 @@ export default function DashboardScreen({
                       const description =
                         transaction.Description ||
                         (isOutflow
-                          ? `Transfer to ${otherUser.FullName}`
-                          : `Payment from ${otherUser.FullName}`);
+                          ? `Transferência para ${otherUser.FullName}`
+                          : `Pagamento de ${otherUser.FullName}`);
                       const date = new Date(
                         transaction.CreatedAt
                       ).toLocaleString("pt-BR", {
