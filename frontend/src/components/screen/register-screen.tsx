@@ -1,9 +1,9 @@
 "use client";
 
 import type React from "react";
-
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
   Eye,
@@ -13,6 +13,7 @@ import {
   User,
   CheckCircle2,
   AlertCircle,
+  AtSign,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -27,20 +28,23 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { register } from "@/actions/register";
 
 export default function RegisterScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    cpf: "",
-    password: "",
-    confirmPassword: "",
+    fullName: "Felipe 2",
+    email: "sant@email.com",
+    username: "",
+    cpf: "181.954.727-20",
+    password: "321321321",
+    confirmPassword: "321321321",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -54,19 +58,11 @@ export default function RegisterScreen() {
 
       // Add formatting
       if (formattedValue.length > 9) {
-        formattedValue = `${formattedValue.slice(0, 3)}.${formattedValue.slice(
-          3,
-          6
-        )}.${formattedValue.slice(6, 9)}-${formattedValue.slice(9)}`;
+        formattedValue = `${formattedValue.slice(0, 3)}.${formattedValue.slice(3, 6)}.${formattedValue.slice(6, 9)}-${formattedValue.slice(9)}`;
       } else if (formattedValue.length > 6) {
-        formattedValue = `${formattedValue.slice(0, 3)}.${formattedValue.slice(
-          3,
-          6
-        )}.${formattedValue.slice(6)}`;
+        formattedValue = `${formattedValue.slice(0, 3)}.${formattedValue.slice(3, 6)}.${formattedValue.slice(6)}`;
       } else if (formattedValue.length > 3) {
-        formattedValue = `${formattedValue.slice(0, 3)}.${formattedValue.slice(
-          3
-        )}`;
+        formattedValue = `${formattedValue.slice(0, 3)}.${formattedValue.slice(3)}`;
       }
 
       setFormData({ ...formData, [name]: formattedValue });
@@ -94,6 +90,13 @@ export default function RegisterScreen() {
       newErrors.email = "Email é obrigatório";
     } else if (!emailRegex.test(formData.email)) {
       newErrors.email = "Por favor, insira um endereço de email válido";
+    }
+
+    // Validate username
+    if (!formData.username.trim()) {
+      newErrors.username = "Nome de usuário é obrigatório";
+    } else if (formData.username.length < 3) {
+      newErrors.username = "O nome de usuário deve ter pelo menos 3 caracteres";
     }
 
     // Validate CPF
@@ -127,24 +130,28 @@ export default function RegisterScreen() {
 
     if (validateForm()) {
       setIsSubmitting(true);
+      setErrors({});
 
       try {
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1500));
+        const result = await register(
+          formData.fullName,
+          formData.email,
+          formData.username,
+          formData.cpf,
+          formData.password
+        );
 
-        // Show success state
-        setIsSuccess(true);
-
-        // Reset form after success (optional)
-        // setFormData({
-        //   fullName: "",
-        //   email: "",
-        //   cpf: "",
-        //   password: "",
-        //   confirmPassword: ""
-        // })
+        if (result.success) {
+          setIsSuccess(true);
+          setTimeout(() => {
+            router.push("/dashboard");
+          }, 1500);
+        } else {
+          setErrors({
+            form: result.error || "Ocorreu um erro durante o registro. Por favor, tente novamente.",
+          });
+        }
       } catch (error) {
-        console.error("Registration error:", error);
         setErrors({
           form: "Ocorreu um erro durante o registro. Por favor, tente novamente.",
         });
@@ -175,11 +182,7 @@ export default function RegisterScreen() {
             <Alert className="bg-green-50 border-green-200">
               <CheckCircle2 className="h-4 w-4 text-green-600" />
               <AlertDescription className="text-green-600">
-                Registro bem-sucedido! Agora você pode{" "}
-                <Link href="/login" className="font-medium underline">
-                  fazer login
-                </Link>{" "}
-                na sua conta.
+                Registro bem-sucedido! Redirecionando para o painel...
               </AlertDescription>
             </Alert>
           ) : (
@@ -199,11 +202,10 @@ export default function RegisterScreen() {
                     id="fullName"
                     name="fullName"
                     placeholder="João Silva"
-                    className={`pl-10 ${
-                      errors.fullName ? "border-red-500" : ""
-                    }`}
+                    className={`pl-10 ${errors.fullName ? "border-red-500" : ""}`}
                     value={formData.fullName}
                     onChange={handleChange}
+                    disabled={isSubmitting}
                   />
                 </div>
                 {errors.fullName && (
@@ -223,10 +225,30 @@ export default function RegisterScreen() {
                     className={`pl-10 ${errors.email ? "border-red-500" : ""}`}
                     value={formData.email}
                     onChange={handleChange}
+                    disabled={isSubmitting}
                   />
                 </div>
                 {errors.email && (
                   <p className="text-sm text-red-500">{errors.email}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="username">Nome de Usuário</Label>
+                <div className="relative">
+                  <AtSign className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="username"
+                    name="username"
+                    placeholder="johndoe"
+                    className={`pl-10 ${errors.username ? "border-red-500" : ""}`}
+                    value={formData.username}
+                    onChange={handleChange}
+                    disabled={isSubmitting}
+                  />
+                </div>
+                {errors.username && (
+                  <p className="text-sm text-red-500">{errors.username}</p>
                 )}
               </div>
 
@@ -243,6 +265,7 @@ export default function RegisterScreen() {
                     className={`pl-10 ${errors.cpf ? "border-red-500" : ""}`}
                     value={formData.cpf}
                     onChange={handleChange}
+                    disabled={isSubmitting}
                   />
                 </div>
                 {errors.cpf && (
@@ -258,25 +281,19 @@ export default function RegisterScreen() {
                     id="password"
                     name="password"
                     type={showPassword ? "text" : "password"}
-                    className={`pl-10 pr-10 ${
-                      errors.password ? "border-red-500" : ""
-                    }`}
+                    className={`pl-10 pr-10 ${errors.password ? "border-red-500" : ""}`}
                     value={formData.password}
                     onChange={handleChange}
+                    disabled={isSubmitting}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
-                    aria-label={
-                      showPassword ? "Ocultar senha" : "Mostrar senha"
-                    }
+                    aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                    disabled={isSubmitting}
                   >
-                    {showPassword ? (
-                      <Eye className="h-4 w-4" />
-                    ) : (
-                      <EyeOff className="h-4 w-4" />
-                    )}
+                    {showPassword ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                   </button>
                 </div>
                 {errors.password && (
@@ -292,31 +309,23 @@ export default function RegisterScreen() {
                     id="confirmPassword"
                     name="confirmPassword"
                     type={showConfirmPassword ? "text" : "password"}
-                    className={`pl-10 pr-10 ${
-                      errors.confirmPassword ? "border-red-500" : ""
-                    }`}
+                    className={`pl-10 pr-10 ${errors.confirmPassword ? "border-red-500" : ""}`}
                     value={formData.confirmPassword}
                     onChange={handleChange}
+                    disabled={isSubmitting}
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
-                    aria-label={
-                      showConfirmPassword ? "Ocultar senha" : "Mostrar senha"
-                    }
+                    aria-label={showConfirmPassword ? "Ocultar senha" : "Mostrar senha"}
+                    disabled={isSubmitting}
                   >
-                    {showConfirmPassword ? (
-                      <Eye className="h-4 w-4" />
-                    ) : (
-                      <EyeOff className="h-4 w-4" />
-                    )}
+                    {showConfirmPassword ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                   </button>
                 </div>
                 {errors.confirmPassword && (
-                  <p className="text-sm text-red-500">
-                    {errors.confirmPassword}
-                  </p>
+                  <p className="text-sm text-red-500">{errors.confirmPassword}</p>
                 )}
               </div>
 

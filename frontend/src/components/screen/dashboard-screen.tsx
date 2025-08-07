@@ -39,6 +39,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { logout } from "@/actions/logout";
 
 export default function DashboardScreen({ user, transactions: initialTransactions }: { user: any; transactions: any[] }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -63,16 +64,9 @@ export default function DashboardScreen({ user, transactions: initialTransaction
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-    }).then((res) => {
-      if (res.ok) {
-        document.cookie = "auth_token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
-        router.push("/login");
-      } else {
-        // Handle error, e.g., alert("Logout failed");
-      }
-    }).catch((error) => {
-      console.error("Logout error:", error);
-    });
+    })
+
+    logout()
   };
 
   useEffect(() => {
@@ -338,12 +332,6 @@ export default function DashboardScreen({ user, transactions: initialTransaction
                     Suas últimas transações e atividades
                   </CardDescription>
                 </div>
-                <Button variant="outline" size="sm" asChild>
-                  <Link href="/transactions">
-                    Ver tudo
-                    <ChevronRight className="ml-1 h-4 w-4" />
-                  </Link>
-                </Button>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
