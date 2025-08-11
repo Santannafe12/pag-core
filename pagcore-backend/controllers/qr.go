@@ -35,20 +35,20 @@ func GenerateQR(c *gin.Context) {
 		ExpiresAt: expiresAt,
 	}
 	if err := config.DB.Create(&qr).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create QR"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Falha ao criar QR Code"})
 		return
 	}
 	fmt.Printf("Created QR code with ID: %d, Amount: %f, ExpiresAt: %s\n", qr.ID, qr.Amount, qr.ExpiresAt.Format(time.RFC3339))
 	qrContent := "pagcore:" + strconv.Itoa(int(qr.ID))
 	png, err := qrcode.Encode(qrContent, qrcode.Medium, 256)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate QR image"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Falha em gerar imagem QR Code"})
 		return
 	}
 	base64QR := base64.StdEncoding.EncodeToString(png)
 	qr.QRCode = base64QR
 	if err := config.DB.Save(&qr).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update QR"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Falha em atualizar QR Code"})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"qr_code": base64QR, "id": qr.ID, "expires_at": qr.ExpiresAt.Format(time.RFC3339)})
@@ -68,30 +68,30 @@ func ProcessQR(c *gin.Context) {
 	var qr models.QRCode
 	if err := config.DB.First(&qr, input.QRCodeID).Error; err != nil {
 		fmt.Printf("QR code %d not found\n", input.QRCodeID)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid QR code"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "QR Code inválido"})
 		return
 	}
 	if userID == qr.UserID {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Cannot pay your own QR code"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Não pode pagar o seu próprio QR Code."})
 		return
 	}
 	fmt.Printf("Processing QR code %d, Status: %s, ExpiresAt: %s, CurrentTime: %s\n",
 		qr.ID, qr.Status, qr.ExpiresAt.Format(time.RFC3339), time.Now().UTC().Format(time.RFC3339))
 	if qr.Status == models.QRStatusExpired || time.Now().UTC().After(qr.ExpiresAt.Add(30*time.Second)) { // Add 30s grace period
-		c.JSON(http.StatusBadRequest, gin.H{"error": "QR code expired", "expires_at": qr.ExpiresAt.Format(time.RFC3339)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "QR code expirado", "expires_at": qr.ExpiresAt.Format(time.RFC3339)})
 		return
 	}
 	var scanner, recipient models.User
 	if err := config.DB.First(&scanner, userID).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Scanner user not found"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Usuário não encontrado"})
 		return
 	}
 	if err := config.DB.First(&recipient, qr.UserID).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Recipient user not found"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Usuário não encontrado"})
 		return
 	}
 	if scanner.Balance < qr.Amount {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Insufficient balance"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Saldo Insuficiente"})
 		return
 	}
 	err := config.DB.Transaction(func(tx *gorm.DB) error {
@@ -117,29 +117,29 @@ func ProcessQR(c *gin.Context) {
 		return tx.Create(&txRecord).Error
 	})
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Payment failed"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Falha no Pagamento"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "Payment processed"})
+	c.JSON(http.StatusOK, gin.H{"message": "Pagamento Efetuado."})
 }
 
 func GetQR(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseUint(idStr, 10, 32)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid QR code ID"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "QR Code Inválido"})
 		return
 	}
 	var qr models.QRCode
 	if err := config.DB.Preload("User").First(&qr, id).Error; err != nil {
 		fmt.Printf("QR code %d not found\n", id)
-		c.JSON(http.StatusNotFound, gin.H{"error": "QR code not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "QR Code não encontrado"})
 		return
 	}
 	fmt.Printf("Retrieved QR code %d, Status: %s, ExpiresAt: %s, CurrentTime: %s\n",
 		qr.ID, qr.Status, qr.ExpiresAt.Format(time.RFC3339), time.Now().UTC().Format(time.RFC3339))
 	if qr.Status == models.QRStatusExpired || time.Now().UTC().After(qr.ExpiresAt.Add(30*time.Second)) { // Add 30s grace period
-		c.JSON(http.StatusBadRequest, gin.H{"error": "QR code expired", "expires_at": qr.ExpiresAt.Format(time.RFC3339)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "QR code expirado", "expires_at": qr.ExpiresAt.Format(time.RFC3339)})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{

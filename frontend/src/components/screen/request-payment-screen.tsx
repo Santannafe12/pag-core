@@ -17,9 +17,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { toast } from "sonner";
 
 interface PaymentRequest {
   ID: number;
@@ -89,7 +89,6 @@ export default function RequestPaymentScreen({
   acceptPaymentRequest,
   declinePaymentRequest,
 }: RequestPaymentScreenProps) {
-  const { toast } = useToast();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [requestData, setRequestData] = useState({
@@ -159,23 +158,19 @@ export default function RequestPaymentScreen({
         message: "",
       });
 
-      toast({
-        title: "Solicitação de Pagamento Enviada",
+      toast("Solicitação de Pagamento Enviada", {
         description: `Solicitação de R$ ${Number.parseFloat(
           requestData.amount
         )} foi enviada para ${requestData.recipient}`,
-        variant: "default",
       });
 
       setRequestsTab("sent");
       router.refresh(); // Refresh the page to reload server-side data
     } catch (error: any) {
-      toast({
-        title: "Solicitação Falhou",
+      toast("Solicitação Falhou", {
         description:
           error.message ||
           "Ocorreu um erro ao processar sua solicitação. Tente novamente.",
-        variant: "destructive",
       });
     } finally {
       setIsLoading(false);

@@ -13,7 +13,7 @@ export async function login(email: string, password: string) {
     });
 
     if (!response.ok) {
-      throw new Error("Login failed");
+      throw new Error("Credenciais inválidas");
     }
 
     const data = await response.json();

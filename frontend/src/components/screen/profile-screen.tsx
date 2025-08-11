@@ -194,12 +194,6 @@ export default function ProfileScreen({
               <CardTitle>{user.full_name}</CardTitle>
               <CardDescription>@{user.username}</CardDescription>
             </CardHeader>
-            <CardContent className="text-center">
-              <Button variant="outline" className="w-full">
-                <Edit className="mr-2 h-4 w-4" />
-                Editar Perfil
-              </Button>
-            </CardContent>
             <CardFooter className="flex justify-center">
               <AlertDialog>
                 <AlertDialogTrigger asChild>

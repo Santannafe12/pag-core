@@ -27,11 +27,11 @@ func MakeTransfer(c *gin.Context) {
 	config.DB.First(&sender, userID)
 	config.DB.Where("username = ?", input.RecipientUsername).First(&recipient)
 	if recipient.ID == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Recipient not found"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Destinatário não encontrado"})
 		return
 	}
 	if sender.Balance < input.Amount {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Insufficient balance"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Saldo insuficiente"})
 		return
 	}
 	err := config.DB.Transaction(func(tx *gorm.DB) error {
@@ -53,10 +53,10 @@ func MakeTransfer(c *gin.Context) {
 		return tx.Create(&txRecord).Error
 	})
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Transfer failed"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao transferir"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "Transfer successful"})
+	c.JSON(http.StatusOK, gin.H{"message": "Sucesso ao transferir"})
 }
 
 func GetTransactionHistory(c *gin.Context) {

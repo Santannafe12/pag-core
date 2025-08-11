@@ -34,12 +34,12 @@ export default function RegisterScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
-    fullName: "Felipe 2",
-    email: "sant@email.com",
+    fullName: "",
+    email: "",
     username: "",
-    cpf: "181.954.727-20",
-    password: "321321321",
-    confirmPassword: "321321321",
+    cpf: "",
+    password: "",
+    confirmPassword: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);

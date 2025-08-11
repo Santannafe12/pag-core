@@ -242,9 +242,11 @@ export default function DashboardScreen({
         <main className="w-full">
           {/* Desktop Header */}
           <header className="hidden lg:flex items-center justify-between p-4 bg-white border-b">
-            <Badge variant="destructive" className="text-sm">
-              ADMIN
-            </Badge>
+            {role === "admin" && (
+              <Badge variant="destructive" className="text-sm">
+                ADMIN
+              </Badge>
+            )}
             <div className="flex items-center justify-end gap-4 w-full">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

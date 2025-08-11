@@ -37,10 +37,10 @@ func Register(c *gin.Context) {
 		Password: string(hashedPassword),
 	}
 	if err := config.DB.Create(&user).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to register user"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Falha ao registrar usuário"})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "User registered successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "Usuário registrado com sucesso."})
 }
 
 type LoginInput struct {
@@ -56,15 +56,15 @@ func Login(c *gin.Context) {
 	}
 	var user models.User
 	if err := config.DB.Where("email = ?", input.Email).First(&user).Error; err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Credenciais inválidas"})
 		return
 	}
 	if bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password)) != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Credenciais inválidas"})
 		return
 	}
 	if user.Status != models.UserStatusActive {
-		c.JSON(http.StatusForbidden, gin.H{"error": "User blocked"})
+		c.JSON(http.StatusForbidden, gin.H{"error": "Usuário bloqueado"})
 		return
 	}
 	// Generate JWT
@@ -94,5 +94,5 @@ func Login(c *gin.Context) {
 func Logout(c *gin.Context) {
 	tokenStr := c.GetHeader("Authorization")[7:] // Bearer <token>
 	config.DB.Where("token = ?", tokenStr).Delete(&models.Session{})
-	c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "Desconectado com sucesso"})
 }

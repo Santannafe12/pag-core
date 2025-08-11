@@ -25,7 +25,7 @@ func BlockUser(c *gin.Context) {
 	var user models.User
 	if err := config.DB.First(&user, idStr).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Usuário não encontrado"})
 			return
 		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
@@ -34,7 +34,7 @@ func BlockUser(c *gin.Context) {
 
 	user.Status = models.UserStatusBlocked
 	if err := config.DB.Save(&user).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to block user"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Falha ao bloquear usuário"})
 		return
 	}
 

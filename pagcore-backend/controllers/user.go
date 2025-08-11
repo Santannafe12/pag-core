@@ -40,13 +40,13 @@ func UpdateProfile(c *gin.Context) {
 	var user models.User
 	config.DB.First(&user, userID)
 	if bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.OldPassword)) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid old password"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Senha antiga inválida"})
 		return
 	}
 	hashedNew, _ := bcrypt.GenerateFromPassword([]byte(input.NewPassword), bcrypt.DefaultCost)
 	user.Password = string(hashedNew)
 	config.DB.Save(&user)
-	c.JSON(http.StatusOK, gin.H{"message": "Password updated"})
+	c.JSON(http.StatusOK, gin.H{"message": "Senha atualizada"})
 }
 
 func GetDashboard(c *gin.Context) {
