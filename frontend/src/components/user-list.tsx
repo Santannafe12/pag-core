@@ -30,7 +30,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -52,6 +58,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { blockUser } from "@/actions/admin";
+import { toast } from "sonner";
 
 interface User {
   id: string;
@@ -66,7 +73,6 @@ interface UserListProps {
 }
 
 export default function UserList({ users }: UserListProps) {
-  const { toast } = useToast();
   const [userStatusFilter, setUserStatusFilter] = useState("all");
   const [userPage, setUserPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
@@ -108,19 +114,28 @@ export default function UserList({ users }: UserListProps) {
     switch (status) {
       case "active":
         return (
-          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+          <Badge
+            variant="outline"
+            className="bg-green-50 text-green-700 border-green-200"
+          >
             Ativo
           </Badge>
         );
       case "blocked":
         return (
-          <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+          <Badge
+            variant="outline"
+            className="bg-red-50 text-red-700 border-red-200"
+          >
             Bloqueado
           </Badge>
         );
       default:
         return (
-          <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">
+          <Badge
+            variant="outline"
+            className="bg-gray-50 text-gray-700 border-gray-200"
+          >
             Desconhecido
           </Badge>
         );
@@ -135,15 +150,12 @@ export default function UserList({ users }: UserListProps) {
       users = users.map((user) =>
         user.id === userId ? { ...user, status: "blocked" } : user
       );
-      toast({
-        title: "Sucesso",
+      toast("Sucesso", {
         description: "Conta do usuário bloqueada com sucesso",
       });
     } catch (error) {
-      toast({
-        title: "Erro",
+      toast("Erro", {
         description: "Falha ao bloquear usuário",
-        variant: "destructive",
       });
     }
   };
@@ -152,7 +164,9 @@ export default function UserList({ users }: UserListProps) {
     <Card>
       <CardHeader>
         <CardTitle>Gerenciamento de Usuários</CardTitle>
-        <CardDescription>Visualize e gerencie contas de usuários</CardDescription>
+        <CardDescription>
+          Visualize e gerencie contas de usuários
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="flex flex-col md:flex-row gap-4 mb-4">
@@ -179,21 +193,28 @@ export default function UserList({ users }: UserListProps) {
               <TableRow>
                 <TableHead className="w-[250px]">Nome</TableHead>
                 <TableHead>Email</TableHead>
-                <TableHead className="hidden md:table-cell">Data de Registro</TableHead>
+                <TableHead className="hidden md:table-cell">
+                  Data de Registro
+                </TableHead>
                 <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {paginatedUsers.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                  <TableCell
+                    colSpan={5}
+                    className="text-center py-8 text-muted-foreground"
+                  >
                     Nenhum usuário encontrado com os critérios especificados.
                   </TableCell>
                 </TableRow>
               ) : (
                 paginatedUsers.map((user) => (
                   <TableRow key={user.id}>
-                    <TableCell className="font-medium">{user.fullName}</TableCell>
+                    <TableCell className="font-medium">
+                      {user.fullName}
+                    </TableCell>
                     <TableCell>{user.email}</TableCell>
                     <TableCell className="hidden md:table-cell">
                       {formatDate(user.createdAt)}
@@ -207,20 +228,27 @@ export default function UserList({ users }: UserListProps) {
                           {user.status !== "blocked" && (
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
-                                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                                <DropdownMenuItem
+                                  onSelect={(e) => e.preventDefault()}
+                                >
                                   <Ban className="mr-2 h-4 w-4" />
                                   Bloquear Conta
                                 </DropdownMenuItem>
                               </AlertDialogTrigger>
                               <AlertDialogContent>
                                 <AlertDialogHeader>
-                                  <AlertDialogTitle>Bloquear Conta do Usuário</AlertDialogTitle>
+                                  <AlertDialogTitle>
+                                    Bloquear Conta do Usuário
+                                  </AlertDialogTitle>
                                   <AlertDialogDescription>
-                                    Tem certeza que deseja bloquear esta conta? O usuário perderá acesso ao sistema PagCore.
+                                    Tem certeza que deseja bloquear esta conta?
+                                    O usuário perderá acesso ao sistema PagCore.
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                  <AlertDialogCancel>
+                                    Cancelar
+                                  </AlertDialogCancel>
                                   <AlertDialogAction
                                     onClick={() => handleBlockUser(user.id)}
                                   >
@@ -258,7 +286,9 @@ export default function UserList({ users }: UserListProps) {
             <Button
               variant="outline"
               size="icon"
-              onClick={() => setUserPage((p) => Math.min(totalUserPages, p + 1))}
+              onClick={() =>
+                setUserPage((p) => Math.min(totalUserPages, p + 1))
+              }
               disabled={userPage === totalUserPages}
             >
               <ChevronRight className="h-4 w-4" />

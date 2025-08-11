@@ -32,6 +32,7 @@ func SetupRouter() *gin.Engine {
 			protected.POST("/payment/decline/:id", controllers.DeclinePaymentRequest)
 			protected.POST("/qr/generate", controllers.GenerateQR)
 			protected.POST("/qr/process", controllers.ProcessQR) // "Read" via API
+			protected.GET("qr/:id", controllers.GetQR)
 
 			// Admin only
 			admin := protected.Group("/admin")

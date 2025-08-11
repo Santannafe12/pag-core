@@ -57,7 +57,7 @@ func GetDashboard(c *gin.Context) {
 	var recentTx []models.Transaction
 	config.DB.Where("sender_id = ? OR recipient_id = ?", userID, userID).
 		Preload("Sender").Preload("Recipient").
-		Order("created_at desc").Limit(5).Find(&recentTx)
+		Order("created_at desc").Find(&recentTx)
 
 	c.JSON(http.StatusOK, gin.H{
 		"user_id":             user.ID,

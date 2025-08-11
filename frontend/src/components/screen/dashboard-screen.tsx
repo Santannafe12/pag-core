@@ -19,6 +19,7 @@ import {
   User,
   Lock,
   X,
+  HandCoins,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -41,6 +42,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { logout } from "@/actions/logout";
+import { Badge } from "../ui/badge";
 
 export default function DashboardScreen({
   user,
@@ -141,9 +143,11 @@ export default function DashboardScreen({
                   </Button> */}
                   {role === "admin" && (
                     <div className="flex items-center gap-1">
-                      <Lock className="mr-2 h-4 w-4" />
                       <Button variant="ghost" className="justify-start" asChild>
-                        <Link href="/admin">Admin</Link>
+                        <Link href="/admin">
+                          <Lock className="mr-2 h-4 w-4" />
+                          Admin
+                        </Link>
                       </Button>
                     </div>
                   )}
@@ -164,9 +168,6 @@ export default function DashboardScreen({
           <span className="font-bold text-lg">PagCore</span>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon">
-            <Bell className="h-5 w-5" />
-          </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="rounded-full">
@@ -186,25 +187,21 @@ export default function DashboardScreen({
                 <User className="mr-2 h-4 w-4" />
                 Perfil
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Settings className="mr-2 h-4 w-4" />
-                Configurações
-              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem className="text-red-500" onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
-                Logout
+                Sair
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </header>
 
-      <div className="flex h-screen lg:pt-0 pt-0">
+      <div className="flex lg:pt-0 pt-0">
         {/* Desktop Sidebar */}
         <aside className="hidden lg:flex flex-col w-64 border-r bg-white">
           <div className="p-4 border-b">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 pb-1">
               <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
                 <CreditCard className="h-4 w-4 text-primary" />
               </div>
@@ -225,43 +222,30 @@ export default function DashboardScreen({
               </Link>
             </Button> */}
             {role === "admin" && (
-              <div className="flex items-center ml-3">
-                <Lock className="h-4 w-4" />
-                <Button variant="ghost" className="justify-start" asChild>
-                  <Link href="/admin">Admin</Link>
+              <div className="flex items-center w-full">
+                <Button
+                  variant="ghost"
+                  className="justify-start w-full"
+                  asChild
+                >
+                  <Link href="/admin">
+                    <Lock className="mr-2 h-4 w-4" />
+                    Admin
+                  </Link>
                 </Button>
               </div>
             )}
           </nav>
-          <div className="mt-auto p-4 border-t">
-            <Button
-              variant="ghost"
-              className="justify-start w-full text-red-500 hover:text-red-600 hover:bg-red-50"
-              onClick={handleLogout}
-            >
-              <LogOut className="mr-2 h-4 w-4" />
-              Logout
-            </Button>
-          </div>
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 overflow-auto">
+        <main className="w-full">
           {/* Desktop Header */}
           <header className="hidden lg:flex items-center justify-between p-4 bg-white border-b">
-            <div className="relative w-64">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Pesquisar..."
-                className="pl-8"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon">
-                <Bell className="h-5 w-5" />
-              </Button>
+            <Badge variant="destructive" className="text-sm">
+              ADMIN
+            </Badge>
+            <div className="flex items-center justify-end gap-4 w-full">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="flex items-center gap-2">
@@ -281,12 +265,10 @@ export default function DashboardScreen({
                   <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>
-                    <User className="mr-2 h-4 w-4" />
-                    Perfil
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Settings className="mr-2 h-4 w-4" />
-                    Configurações
+                    <Link href="/profile" className="flex items-center gap-2">
+                      <User className="mr-2 h-4 w-4" />
+                      Perfil
+                    </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
@@ -294,7 +276,7 @@ export default function DashboardScreen({
                     onClick={handleLogout}
                   >
                     <LogOut className="mr-2 h-4 w-4" />
-                    Logout
+                    Sair
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -313,9 +295,9 @@ export default function DashboardScreen({
                       {user.full_name}
                     </CardTitle>
                   </div>
-                  <div className="bg-primary/5 p-4 rounded-lg">
-                    <CardDescription>Saldo Atual</CardDescription>
-                    <CardTitle className="text-3xl font-bold">
+                  <div>
+                    <CardDescription>Saldo Disponível</CardDescription>
+                    <CardTitle className="text-2xl font-bold">
                       R${" "}
                       {user.balance.toLocaleString("pt-BR", {
                         minimumFractionDigits: 2,
@@ -327,7 +309,7 @@ export default function DashboardScreen({
             </Card>
 
             {/* Action Buttons */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
               <Button
                 size="lg"
                 className="h-auto py-6 flex flex-col items-center gap-2"
@@ -338,16 +320,16 @@ export default function DashboardScreen({
                   <span>Transferir</span>
                 </Link>
               </Button>
-              {/* <Button
+              <Button
                 size="lg"
                 className="h-auto py-6 flex flex-col items-center gap-2"
                 asChild
               >
-                <Link href="/qr">
+                <Link href="/qr-code">
                   <QrCode className="h-6 w-6" />
                   <span>Receber via QR Code</span>
                 </Link>
-              </Button> */}
+              </Button>
               <Button
                 size="lg"
                 className="h-auto py-6 flex flex-col items-center gap-2"
@@ -356,6 +338,16 @@ export default function DashboardScreen({
                 <Link href="/request-payment">
                   <ArrowDownLeft className="h-6 w-6" />
                   <span>Solicitar Pagamento</span>
+                </Link>
+              </Button>
+              <Button
+                size="lg"
+                className="h-auto py-6 flex flex-col items-center gap-2"
+                asChild
+              >
+                <Link href="/requests">
+                  <HandCoins className="h-6 w-6" />
+                  <span>Solicitações</span>
                 </Link>
               </Button>
             </div>
@@ -368,6 +360,15 @@ export default function DashboardScreen({
                   <CardDescription>
                     Suas últimas transações e atividades
                   </CardDescription>
+                </div>
+                <div className="relative w-64">
+                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Pesquisar..."
+                    className="pl-8"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
                 </div>
               </CardHeader>
               <CardContent>

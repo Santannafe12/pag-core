@@ -30,13 +30,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useToast } from "@/hooks/use-toast";
 import UserList from "../user-list";
 import { getStats } from "@/actions/admin";
 import Link from "next/link";
 
 export default function AdminDashboardScreen({ stats, users }: { stats: any, users: any }) {
-  const { toast } = useToast();
 
   // Parse the stats.value and users.value strings into objects
   const parsedStats = JSON.parse(stats.value);

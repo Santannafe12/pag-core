@@ -1,17 +1,33 @@
-"use client"
+// components/screen/profile-screen.tsx
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import Link from "next/link"
-import { ArrowLeft, Calendar, Edit, Key, LogOut, Mail, User } from "lucide-react"
+import { useState } from "react";
+import Link from "next/link";
+import {
+  ArrowLeft,
+  Calendar,
+  Edit,
+  Key,
+  LogOut,
+  Mail,
+  User,
+} from "lucide-react";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import {
   Dialog,
   DialogContent,
@@ -20,7 +36,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,112 +47,119 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-import { useToast } from "@/hooks/use-toast"
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
-export default function ProfileScreen() {
-  const { toast } = useToast()
-  const [isLoading, setIsLoading] = useState(false)
+interface ProfileScreenProps {
+  user: any;
+  updatePassword: ({
+    old_password,
+    new_password,
+  }: {
+    old_password: string;
+    new_password: string;
+  }) => Promise<any>;
+  logout: () => Promise<void>;
+}
+
+export default function ProfileScreen({
+  user,
+  updatePassword,
+  logout,
+}: ProfileScreenProps) {
+  const [isLoading, setIsLoading] = useState(false);
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
-  })
-  const [errors, setErrors] = useState<Record<string, string>>({})
-
-  // Mock user data
-  const user = {
-    name: "Carlos Oliveira",
-    email: "carlos.oliveira@example.com",
-    username: "carlos.oliveira",
-    registrationDate: "2023-06-15T10:30:00",
-    avatar: "/placeholder.svg?height=128&width=128",
-  }
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setPasswordData({ ...passwordData, [name]: value })
+    const { name, value } = e.target;
+    setPasswordData({ ...passwordData, [name]: value });
 
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors({ ...errors, [name]: "" })
+      setErrors({ ...errors, [name]: "" });
     }
-  }
+  };
 
   const validatePasswordForm = () => {
-    const newErrors: Record<string, string> = {}
+    const newErrors: Record<string, string> = {};
 
     // Validate current password
     if (!passwordData.currentPassword) {
-      newErrors.currentPassword = "Current password is required"
+      newErrors.currentPassword = "Senha atual é obrigatória";
     }
 
     // Validate new password
     if (!passwordData.newPassword) {
-      newErrors.newPassword = "New password is required"
+      newErrors.newPassword = "Nova senha é obrigatória";
     } else if (passwordData.newPassword.length < 8) {
-      newErrors.newPassword = "Password must be at least 8 characters"
+      newErrors.newPassword = "Senha deve ter pelo menos 8 caracteres";
     }
 
     // Validate password confirmation
     if (!passwordData.confirmPassword) {
-      newErrors.confirmPassword = "Please confirm your new password"
+      newErrors.confirmPassword = "Por favor, confirme sua nova senha";
     } else if (passwordData.newPassword !== passwordData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match"
+      newErrors.confirmPassword = "Senhas não coincidem";
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handlePasswordSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (validatePasswordForm()) {
-      setIsLoading(true)
+      setIsLoading(true);
 
       try {
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1500))
+        await updatePassword({
+          old_password: passwordData.currentPassword,
+          new_password: passwordData.newPassword,
+        });
 
         // Reset form
         setPasswordData({
           currentPassword: "",
           newPassword: "",
           confirmPassword: "",
-        })
+        });
 
         // Show success toast
-        toast({
-          title: "Password Updated",
-          description: "Your password has been successfully updated.",
-          variant: "default",
-        })
+        toast("Senha Atualizada", {
+          description: "Sua senha foi atualizada com sucesso.",
+        });
 
-        // Close dialog (would need to be handled via state in a real implementation)
-        document.querySelector('[data-state="open"]')?.dispatchEvent(new MouseEvent("click", { bubbles: true }))
-      } catch {
+        // Close dialog
+        document
+          .querySelector('[data-state="open"]')
+          ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+      } catch (error: any) {
         // Show error toast
-        toast({
-          title: "Update Failed",
-          description: "An error occurred while updating your password. Please try again.",
-          variant: "destructive",
-        })
+        toast("Atualização Falhou", {
+          description:
+            "Ocorreu um erro ao atualizar sua senha. Por favor, tente novamente.",
+        });
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
     }
-  }
+  };
 
   // Format date for display
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString("en-US", {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("pt-BR", {
       year: "numeric",
       month: "long",
       day: "numeric",
-    })
-  }
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
@@ -146,10 +169,10 @@ export default function ProfileScreen() {
             <Button variant="ghost" size="icon" asChild className="mr-2">
               <Link href="/dashboard">
                 <ArrowLeft className="h-5 w-5" />
-                <span className="sr-only">Back to Dashboard</span>
+                <span className="sr-only">Voltar ao Painel</span>
               </Link>
             </Button>
-            <h1 className="text-2xl font-bold">My Profile</h1>
+            <h1 className="text-2xl font-bold">Meu Perfil</h1>
           </div>
         </header>
 
@@ -159,17 +182,22 @@ export default function ProfileScreen() {
             <CardHeader className="text-center">
               <div className="flex justify-center mb-4">
                 <Avatar className="h-24 w-24">
-                  <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.name} />
-                  <AvatarFallback className="text-2xl">{user.name.charAt(0)}</AvatarFallback>
+                  <AvatarImage
+                    src="/placeholder.svg?height=128&width=128"
+                    alt={user.full_name}
+                  />
+                  <AvatarFallback className="text-2xl">
+                    {user.full_name.charAt(0)}
+                  </AvatarFallback>
                 </Avatar>
               </div>
-              <CardTitle>{user.name}</CardTitle>
+              <CardTitle>{user.full_name}</CardTitle>
               <CardDescription>@{user.username}</CardDescription>
             </CardHeader>
             <CardContent className="text-center">
               <Button variant="outline" className="w-full">
                 <Edit className="mr-2 h-4 w-4" />
-                Edit Profile
+                Editar Perfil
               </Button>
             </CardContent>
             <CardFooter className="flex justify-center">
@@ -177,19 +205,22 @@ export default function ProfileScreen() {
                 <AlertDialogTrigger asChild>
                   <Button variant="destructive" className="w-full">
                     <LogOut className="mr-2 h-4 w-4" />
-                    Logout
+                    Sair
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Are you sure you want to logout?</AlertDialogTitle>
+                    <AlertDialogTitle>
+                      Tem certeza que deseja sair?
+                    </AlertDialogTitle>
                     <AlertDialogDescription>
-                      You will be logged out of your PagCore account on this device.
+                      Você será desconectado da sua conta PagCore neste
+                      dispositivo.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction>Logout</AlertDialogAction>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction onClick={logout}>Sair</AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
@@ -199,41 +230,50 @@ export default function ProfileScreen() {
           {/* Profile Details Card */}
           <Card className="md:col-span-2">
             <CardHeader>
-              <CardTitle>Account Information</CardTitle>
-              <CardDescription>View and manage your account details</CardDescription>
+              <CardTitle>Informações da Conta</CardTitle>
+              <CardDescription>
+                Visualize e gerencie os detalhes da sua conta
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Personal Information */}
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Personal Information</h3>
+                <h3 className="text-lg font-medium">Informações Pessoais</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <div className="flex items-center text-sm text-muted-foreground">
                       <User className="mr-2 h-4 w-4" />
-                      Full Name
+                      Nome Completo
                     </div>
-                    <p className="font-medium">{user.name}</p>
+                    <p className="font-medium">{user.full_name}</p>
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center text-sm text-muted-foreground">
                       <Mail className="mr-2 h-4 w-4" />
-                      Email Address
+                      Endereço de Email
                     </div>
                     <p className="font-medium">{user.email}</p>
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center text-sm text-muted-foreground">
                       <User className="mr-2 h-4 w-4" />
-                      Username
+                      Nome de Usuário
                     </div>
                     <p className="font-medium">@{user.username}</p>
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center text-sm text-muted-foreground">
-                      <Calendar className="mr-2 h-4 w-4" />
-                      Member Since
+                      <User className="mr-2 h-4 w-4" />
+                      CPF
                     </div>
-                    <p className="font-medium">{formatDate(user.registrationDate)}</p>
+                    <p className="font-medium">{user.cpf}</p>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center text-sm text-muted-foreground">
+                      <Calendar className="mr-2 h-4 w-4" />
+                      Membro Desde
+                    </div>
+                    <p className="font-medium">{formatDate(user.created_at)}</p>
                   </div>
                 </div>
               </div>
@@ -242,70 +282,94 @@ export default function ProfileScreen() {
 
               {/* Security */}
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Security</h3>
+                <h3 className="text-lg font-medium">Segurança</h3>
                 <div className="space-y-2">
                   <div className="flex items-center text-sm text-muted-foreground">
                     <Key className="mr-2 h-4 w-4" />
-                    Password
+                    Senha
                   </div>
                   <div className="flex items-center justify-between">
                     <p className="font-medium">••••••••</p>
                     <Dialog>
                       <DialogTrigger asChild>
                         <Button variant="outline" size="sm">
-                          Change Password
+                          Alterar Senha
                         </Button>
                       </DialogTrigger>
                       <DialogContent className="sm:max-w-md">
                         <DialogHeader>
-                          <DialogTitle>Change Password</DialogTitle>
+                          <DialogTitle>Alterar Senha</DialogTitle>
                           <DialogDescription>
-                            Enter your current password and a new password to update your credentials.
+                            Digite sua senha atual e uma nova senha para
+                            atualizar suas credenciais.
                           </DialogDescription>
                         </DialogHeader>
-                        <form onSubmit={handlePasswordSubmit} className="space-y-4 py-4">
+                        <form
+                          onSubmit={handlePasswordSubmit}
+                          className="space-y-4 py-4"
+                        >
                           <div className="space-y-2">
-                            <Label htmlFor="currentPassword">Current Password</Label>
+                            <Label htmlFor="currentPassword">Senha Atual</Label>
                             <Input
                               id="currentPassword"
                               name="currentPassword"
                               type="password"
-                              placeholder="Enter your current password"
-                              className={errors.currentPassword ? "border-red-500" : ""}
+                              placeholder="Digite sua senha atual"
+                              className={
+                                errors.currentPassword ? "border-red-500" : ""
+                              }
                               value={passwordData.currentPassword}
                               onChange={handlePasswordChange}
                             />
-                            {errors.currentPassword && <p className="text-sm text-red-500">{errors.currentPassword}</p>}
+                            {errors.currentPassword && (
+                              <p className="text-sm text-red-500">
+                                {errors.currentPassword}
+                              </p>
+                            )}
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor="newPassword">New Password</Label>
+                            <Label htmlFor="newPassword">Nova Senha</Label>
                             <Input
                               id="newPassword"
                               name="newPassword"
                               type="password"
-                              placeholder="Enter your new password"
-                              className={errors.newPassword ? "border-red-500" : ""}
+                              placeholder="Digite sua nova senha"
+                              className={
+                                errors.newPassword ? "border-red-500" : ""
+                              }
                               value={passwordData.newPassword}
                               onChange={handlePasswordChange}
                             />
-                            {errors.newPassword && <p className="text-sm text-red-500">{errors.newPassword}</p>}
+                            {errors.newPassword && (
+                              <p className="text-sm text-red-500">
+                                {errors.newPassword}
+                              </p>
+                            )}
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                            <Label htmlFor="confirmPassword">
+                              Confirme a Nova Senha
+                            </Label>
                             <Input
                               id="confirmPassword"
                               name="confirmPassword"
                               type="password"
-                              placeholder="Confirm your new password"
-                              className={errors.confirmPassword ? "border-red-500" : ""}
+                              placeholder="Confirme sua nova senha"
+                              className={
+                                errors.confirmPassword ? "border-red-500" : ""
+                              }
                               value={passwordData.confirmPassword}
                               onChange={handlePasswordChange}
                             />
-                            {errors.confirmPassword && <p className="text-sm text-red-500">{errors.confirmPassword}</p>}
+                            {errors.confirmPassword && (
+                              <p className="text-sm text-red-500">
+                                {errors.confirmPassword}
+                              </p>
+                            )}
                           </div>
                           <DialogFooter className="mt-6">
                             <Button type="submit" disabled={isLoading}>
-                              {isLoading ? "Updating..." : "Update Password"}
+                              {isLoading ? "Atualizando..." : "Atualizar Senha"}
                             </Button>
                           </DialogFooter>
                         </form>
@@ -314,21 +378,10 @@ export default function ProfileScreen() {
                   </div>
                 </div>
               </div>
-
-              <Separator />
-
-              {/* Account Preferences */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">Account Preferences</h3>
-                <div className="space-y-2">
-                  <Button variant="outline">Notification Settings</Button>
-                  <Button variant="outline">Privacy Settings</Button>
-                </div>
-              </div>
             </CardContent>
           </Card>
         </div>
       </div>
     </div>
-  )
+  );
 }

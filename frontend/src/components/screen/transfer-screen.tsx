@@ -15,8 +15,8 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
 import { makeTransfer } from "@/actions/transfer";
+import { toast } from "sonner";
 
 interface User {
   full_name: string;
@@ -29,7 +29,6 @@ interface TransferScreenProps {
 }
 
 export default function TransferScreen({ user }: TransferScreenProps) {
-  const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [transferData, setTransferData] = useState({
     recipient: "",
@@ -97,23 +96,18 @@ export default function TransferScreen({ user }: TransferScreenProps) {
         amount: "",
         description: "",
       });
-
-      toast({
-        title: "Transferência Concluída",
+      toast("Transferência Concluída", {
         description: `R$ ${Number.parseFloat(
           transferData.amount
         ).toLocaleString("pt-BR", {
           minimumFractionDigits: 2,
         })} foi enviado para ${transferData.recipient}`,
-        variant: "default",
       });
     } catch (error: any) {
-      toast({
-        title: "Transferência Falhou",
+      toast("Transferência Falhou", {
         description:
           error.message ||
           "Ocorreu um erro ao processar sua transferência. Tente novamente.",
-        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
